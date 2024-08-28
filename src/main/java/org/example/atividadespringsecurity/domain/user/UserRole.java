@@ -14,6 +14,6 @@ public enum UserRole {
     }
 
     String getFullRoleString() {
-        return "ROLE_" + this.role.toUpperCase();
+        return "ROLE_" + this.getRole().toUpperCase();
     }
 }
