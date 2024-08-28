@@ -1,5 +1,6 @@
 package org.example.atividadespringsecurity.controllers;
 
+import jakarta.validation.Valid;
 import org.example.atividadespringsecurity.domain.appointment.Appointment;
 import org.example.atividadespringsecurity.domain.appointment.AppointmentDTO;
 import org.example.atividadespringsecurity.services.AppointmentService;
@@ -33,7 +34,7 @@ public class AppointmentController {
     }
 
     @PostMapping
-    public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody AppointmentDTO appointmentDTO) {
+    public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody @Valid AppointmentDTO appointmentDTO) {
         Appointment savedAppointment = appointmentService.saveAppointment(appointmentDTO);
 
         URI location = ServletUriComponentsBuilder
