@@ -3,6 +3,7 @@ package org.example.atividadespringsecurity.services;
 import org.example.atividadespringsecurity.domain.appointment.Appointment;
 import org.example.atividadespringsecurity.domain.appointment.AppointmentDTO;
 import org.example.atividadespringsecurity.repositories.AppointmentRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,17 +29,9 @@ public class AppointmentService {
         return appointmentRepository.save(this.convertToModel(appointmentDTO));
     }
 
-    public AppointmentDTO convertToDTO(Appointment appointment) {
-        return new AppointmentDTO(appointment.getDoctorName(),
-                                  appointment.getPatientName(),
-                                  appointment.getAppointmentDate());
-    }
-
     private Appointment convertToModel(AppointmentDTO appointmentDTO) {
-        return Appointment.builder()
-                .doctorName(appointmentDTO.doctorName())
-                .patientName(appointmentDTO.patientName())
-                .appointmentDate(appointmentDTO.appointmentDate())
-                .build();
+        Appointment appointmentModel = new Appointment();
+        BeanUtils.copyProperties(appointmentDTO, appointmentModel);
+        return appointmentModel;
     }
 }

@@ -22,19 +22,17 @@ public class AppointmentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AppointmentDTO>> getAllAppointments() {
-        return ResponseEntity.ok(appointmentService.findAll()
-                                         .stream()
-                                         .map(appointmentService::convertToDTO).toList());
+    public ResponseEntity<List<Appointment>> getAllAppointments() {
+        return ResponseEntity.ok(appointmentService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable long id) {
-        return ResponseEntity.ok(appointmentService.convertToDTO(appointmentService.findById(id)));
+    public ResponseEntity<Appointment> getAppointmentById(@PathVariable long id) {
+        return ResponseEntity.ok(appointmentService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody @Valid AppointmentDTO appointmentDTO) {
+    public ResponseEntity<Appointment> createAppointment(@RequestBody @Valid AppointmentDTO appointmentDTO) {
         Appointment savedAppointment = appointmentService.saveAppointment(appointmentDTO);
 
         URI location = ServletUriComponentsBuilder
