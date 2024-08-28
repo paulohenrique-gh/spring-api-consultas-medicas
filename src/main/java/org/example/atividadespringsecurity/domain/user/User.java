@@ -39,7 +39,7 @@ public class User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (this.role == UserRole.ADMIN) {
             return Arrays.stream(UserRole.values())
-                    .map(role1 -> new SimpleGrantedAuthority(role1.getFullRoleString()))
+                    .map(role -> new SimpleGrantedAuthority(role.getFullRoleString()))
                     .toList();
         }
         return List.of(new SimpleGrantedAuthority(this.role.getFullRoleString()));
