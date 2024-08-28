@@ -25,6 +25,10 @@ public class AppointmentService {
         return appointmentRepository.findById(id).orElseThrow(() -> new RuntimeException("Appointment not found"));
     }
 
+    public List<Appointment> findByPatientName(String patientName) {
+        return appointmentRepository.findByPatientName(patientName);
+    }
+
     public Appointment saveAppointment(AppointmentDTO appointmentDTO) {
         return appointmentRepository.save(this.convertToModel(appointmentDTO));
     }
