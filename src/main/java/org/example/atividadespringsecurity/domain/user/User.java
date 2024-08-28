@@ -1,6 +1,8 @@
 package org.example.atividadespringsecurity.domain.user;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @EqualsAndHashCode(of = "id")
 public class User implements UserDetails {
 
@@ -21,10 +24,13 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    private String login;
+    @NotBlank
+    private String username;
 
+    @NotBlank
     private String password;
 
+    @NotNull
     private UserRole role;
 
     @Override
