@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.example.atividadespringsecurity.domain.user.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,11 @@ public class TokenService {
 
     @Value("${api.security.token.secret")
     private String secret;
+    private final BlacklistedTokenRepository blacklistedTokenRepository;
+
+    TokenService(BlacklistedTokenRepository blacklistedTokenRepository) {
+        this.blacklistedTokenRepository = blacklistedTokenRepository;
+    }
 
     public String generateToken(User user) {
         try {
@@ -43,6 +49,22 @@ public class TokenService {
         } catch (JWTVerificationException exception) {
             throw new RuntimeException("Error validating token: ", exception);
         }
+    }
+
+    public void blacklistToken(String token) {
+        BlacklistedToken blacklistedToken = new BlacklistedToken();
+        blacklistedToken.setToken(token);
+        this.blacklistedTokenRepository.save(blacklistedToken);
+    }
+
+    public boolean isBlacklisted(String token) {
+        return this.blacklistedTokenRepository.existsByToken(token);
+    }
+
+    public String recoverTokenFromRequest(HttpServletRequest request) {
+        var authHeader = request.getHeader("Authorization");
+        if (authHeader == null) return null;
+        return authHeader.replace("Bearer ", "");
     }
 
     private Instant generateExpirationDate() {
