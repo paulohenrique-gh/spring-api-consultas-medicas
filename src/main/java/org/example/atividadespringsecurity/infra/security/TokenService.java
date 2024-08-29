@@ -54,7 +54,7 @@ public class TokenService {
         this.blacklistedTokenRepository.save(blacklistedToken);
     }
 
-    public boolean isBlacklisted(String token) {
+    private boolean isBlacklisted(String token) {
         return this.blacklistedTokenRepository.existsByToken(token);
     }
 
