@@ -1,9 +1,10 @@
 package org.example.atividadespringsecurity.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.example.atividadespringsecurity.domain.GenericResponseDTO;
 import org.example.atividadespringsecurity.domain.user.AuthDTO;
-import org.example.atividadespringsecurity.domain.user.LoginResponseDTO;
+import org.example.atividadespringsecurity.domain.user.TokenDTO;
 import org.example.atividadespringsecurity.domain.user.User;
 import org.example.atividadespringsecurity.domain.user.UserRegisterDTO;
 import org.example.atividadespringsecurity.infra.security.TokenService;
@@ -46,11 +47,17 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthDTO userData) {
+    public ResponseEntity<TokenDTO> login(@RequestBody @Valid AuthDTO userData) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(userData.username(), userData.password());
         var authentication = this.authenticationManager.authenticate(usernamePassword);
         var token = this.tokenService.generateToken((User) authentication.getPrincipal());
 
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+        return ResponseEntity.ok(new TokenDTO(token));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<GenericResponseDTO> logout(HttpServletRequest request) {
+        this.tokenService.blacklistToken(this.tokenService.recoverTokenFromRequest(request));
+        return ResponseEntity.ok(new GenericResponseDTO("User logged out successfully"));
     }
 }
