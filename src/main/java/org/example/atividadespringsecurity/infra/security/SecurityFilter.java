@@ -1,5 +1,6 @@
 package org.example.atividadespringsecurity.infra.security;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,17 +26,16 @@ public class SecurityFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var token = this.tokenService.recoverTokenFromRequest(request);
 
-        if (this.tokenService.isBlacklisted(token)) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
         if (token != null) {
-            var username = tokenService.validateToken(token);
-            UserDetails user = userRepository.findByUsername(username);
+            try {
+                var username = tokenService.validateToken(token);
+                UserDetails user = userRepository.findByUsername(username);
 
-            var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (JWTVerificationException exception) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            }
         }
 
         filterChain.doFilter(request, response);
