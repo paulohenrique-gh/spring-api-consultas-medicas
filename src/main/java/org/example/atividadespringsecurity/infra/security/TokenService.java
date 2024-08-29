@@ -3,6 +3,7 @@ package org.example.atividadespringsecurity.infra.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.example.atividadespringsecurity.domain.user.User;
@@ -24,31 +25,27 @@ public class TokenService {
         this.blacklistedTokenRepository = blacklistedTokenRepository;
     }
 
-    public String generateToken(User user) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+    public String generateToken(User user) throws JWTCreationException {
+        Algorithm algorithm = Algorithm.HMAC256(secret);
 
-            return JWT.create()
-                    .withIssuer("appointments-api")
-                    .withSubject(user.getUsername())
-                    .withExpiresAt(this.generateExpirationDate())
-                    .sign(algorithm);
-        } catch (JWTCreationException exception) {
-            throw new RuntimeException("Error generating token: ", exception);
-        }
+        return JWT.create()
+                .withIssuer("appointments-api")
+                .withSubject(user.getUsername())
+                .withExpiresAt(this.generateExpirationDate())
+                .sign(algorithm);
     }
 
-    public String validateToken(String token) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-            return JWT.require(algorithm)
-                    .withIssuer("appointments-api")
-                    .build()
-                    .verify(token)
-                    .getSubject();
-        } catch (JWTVerificationException exception) {
-            throw new RuntimeException("Error validating token: ", exception);
+    public String validateToken(String token) throws JWTVerificationException {
+        if (this.isBlacklisted(token)) {
+            throw new JWTVerificationException("Token is blacklisted");
         }
+
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        return JWT.require(algorithm)
+                .withIssuer("appointments-api")
+                .build()
+                .verify(token)
+                .getSubject();
     }
 
     public void blacklistToken(String token) {
