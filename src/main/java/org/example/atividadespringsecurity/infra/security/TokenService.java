@@ -7,11 +7,13 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.example.atividadespringsecurity.domain.user.User;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.stream.Collectors;
 
 @Service
 public class TokenService {
@@ -27,9 +29,14 @@ public class TokenService {
     public String generateToken(User user) throws JWTCreationException {
         Algorithm algorithm = Algorithm.HMAC256(secret);
 
+        String roles = user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
         return JWT.create()
                 .withIssuer("appointments-api")
                 .withSubject(user.getUsername())
+                .withClaim("roles", roles)
                 .withExpiresAt(this.generateExpirationDate())
                 .sign(algorithm);
     }
