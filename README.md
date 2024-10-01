@@ -1,5 +1,11 @@
-# Configuração Básica de Autenticação e Autorização
-## Objetivo: Configurar autenticação básica usando o Spring Security.
+# API Consultas Médicas
+
+Atividade do bootcamp T-Academy com implementação de autenticação e autorização com Spring Security
+
+---
+## Desafio
+
+### Objetivo: Configurar autenticação básica usando o Spring Security.
 Crie uma aplicação com os seguintes endpoints:
 
 - auth:
